@@ -162,7 +162,7 @@ func (b *build) Reload() (bool, error) {
 }
 
 func (b *build) Reset() error {
-	if b.status == BuildStatusPending || b.status == BuildStatusStarted {
+	if b.IsRunning() {
 		return errors.New("cannot reset builds until they are finished")
 	}
 
@@ -205,6 +205,11 @@ func (b *build) Reset() error {
 		}).
 		RunWith(tx).
 		Exec()
+	if err != nil {
+		return err
+	}
+
+	err = createBuildEventSeq(tx, b.id)
 	if err != nil {
 		return err
 	}
