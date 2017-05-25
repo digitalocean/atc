@@ -9,9 +9,12 @@ import (
 )
 
 func (s *Server) CreateRebuild(build dbng.Build) http.Handler {
+	logger := s.logger.Session("create-rebuild")
+
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		err := build.Reset()
 		if err != nil {
+			logger.Error("failed-to-reset-build", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
 			return
