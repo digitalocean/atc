@@ -68,6 +68,7 @@ type Build interface {
 	SaveStatus(s BuildStatus) error
 	SetInterceptible(bool) error
 	MarkAsFailed(cause error) error
+	Reset() error
 
 	Events(uint) (EventSource, error)
 	SaveEvent(event atc.Event) error
@@ -158,6 +159,59 @@ func (b *build) Reload() (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (b *build) Reset() error {
+	if b.status == BuildStatusPending || b.status == BuildStatusStarted {
+		return errors.New("cannot reset builds until they are finished")
+	}
+
+	tx, err := b.conn.Begin()
+	if err != nil {
+		return err
+	}
+
+	defer tx.Rollback()
+
+	rows, err := psql.Update("builds").
+		Set("status", BuildStatusPending).
+		Set("scheduled", false).
+		Set("start_time", nil).
+		Set("end_time", nil).
+		Set("engine", nil).
+		Set("engine_metadata", nil).
+		Set("completed", false).
+		Set("reap_time", nil).
+		Set("interceptible", true).
+		Where(sq.Eq{
+			"id": b.id,
+		}).
+		RunWith(tx).
+		Exec()
+	if err != nil {
+		return err
+	}
+
+	affected, err := rows.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if affected == 0 {
+		return ErrBuildDisappeared
+	}
+
+	_, err = psql.Delete("build_events").
+		Where(sq.Eq{
+			"build_id": b.id,
+		}).
+		RunWith(tx).
+		Exec()
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }
 
 func (b *build) Interceptible() (bool, error) {
