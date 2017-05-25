@@ -11,8 +11,8 @@ import (
 	"github.com/concourse/atc/dbng"
 )
 
-func (s *Server) Rebuild(build dbng.Build) http.Handler {
-	hLog := s.logger.Session("rebuild")
+func (s *Server) CreateRebuild(build dbng.Build) http.Handler {
+	hLog := s.logger.Session("create-rebuild")
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var plan atc.Plan
@@ -23,7 +23,7 @@ func (s *Server) Rebuild(build dbng.Build) http.Handler {
 			return
 		}
 
-		err := build.Reset()
+		err = build.Reset()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return

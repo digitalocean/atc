@@ -94,6 +94,7 @@ func (wrappa *APIAuthWrappa) Wrap(handlers rata.Handlers) rata.Handlers {
 		// authenticated
 		case atc.GetAuthToken,
 			atc.CreateBuild,
+			atc.CreateRebuild,
 			atc.CreatePipe,
 			atc.GetContainer,
 			atc.HijackContainer,
