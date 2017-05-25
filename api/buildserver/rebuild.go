@@ -20,19 +20,54 @@ func (s *Server) CreateRebuild(build dbng.Build) http.Handler {
 			return
 		}
 
-		//go func() {
-		//			nextPendingBuilds, err := s.Pipeline.GetPendingBuildsForJob(build.JobName())
+		scheduled, err := build.Schedule()
+		if err != nil {
+			logger.Error("failed-to-schedule-build", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
+		}
+		if !scheduled {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
+		}
+
+		//p, ok, err := build.Pipeline()
+		//		if !ok {
 		//			if err != nil {
-		//				logger.Error("failed-to-get-next-pending-build-for-job", err)
+		//				w.WriteHeader(http.StatusInternalServerError)
+		//				w.Write([]byte(err.Error()))
 		//				return
 		//			}
+		//			w.WriteHeader(http.StatusNotFound)
+		//			return
+		//		}
 		//
-		//			err = s.BuildStarter.TryStartPendingBuildsForJob(logger, jobConfig, resourceConfigs, resourceTypes, nextPendingBuilds)
+		//		inputs, outputs, err := build.Resources()
+		//		if err != nil {
+		//			w.WriteHeader(http.StatusInternalServerError)
+		//			w.Write([]byte(err.Error()))
+		//			return
+		//		}
+		//
+		//		job, ok, err := p.Job(build.JobName())
+		//		if !ok {
 		//			if err != nil {
-		//				logger.Error("failed-to-start-next-pending-build-for-job", err, lager.Data{"job-name": jobConfig.Name})
+		//				w.WriteHeader(http.StatusInternalServerError)
+		//				w.Write([]byte(err.Error()))
 		//				return
 		//			}
-		//		}()
+		//			w.WriteHeader(http.StatusNotFound)
+		//			return
+		//		}
+		//
+		//		engineBuild, err := s.engine.CreateBuild(hLog, build, plan)
+		//		if err != nil {
+		//			hLog.Error("failed-to-start-build", err)
+		//			w.WriteHeader(http.StatusInternalServerError)
+		//			return
+		//		}
+		//
+		//		go engineBuild.Resume(logger)
 
 		w.WriteHeader(http.StatusOK)
 
