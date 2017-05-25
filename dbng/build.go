@@ -178,8 +178,6 @@ func (b *build) Reset() error {
 		Set("scheduled", true).
 		Set("start_time", nil).
 		Set("end_time", nil).
-		Set("engine", nil).
-		Set("engine_metadata", nil).
 		Set("completed", false).
 		Set("reap_time", nil).
 		Set("interceptible", true).
