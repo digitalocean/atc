@@ -9,8 +9,6 @@ import (
 )
 
 func (s *Server) CreateRebuild(build dbng.Build) http.Handler {
-	hLog := s.logger.Session("create-rebuild")
-
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		err := build.Reset()
 		if err != nil {
