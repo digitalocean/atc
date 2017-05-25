@@ -13,6 +13,7 @@ func (s *Server) CreateRebuild(build dbng.Build) http.Handler {
 		err := build.Reset()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
 			return
 		}
 
