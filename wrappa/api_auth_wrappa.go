@@ -69,7 +69,7 @@ func (wrappa *APIAuthWrappa) Wrap(handlers rata.Handlers) rata.Handlers {
 
 		// resource belongs to authorized team
 		case atc.AbortBuild,
-			atc.CreateBuild:
+			atc.CreateRebuild:
 			newHandler = wrappa.checkBuildWriteAccessHandlerFactory.HandlerFor(handler, rejector)
 
 		// requester is system, admin team, or worker owning team
@@ -94,7 +94,7 @@ func (wrappa *APIAuthWrappa) Wrap(handlers rata.Handlers) rata.Handlers {
 
 		// authenticated
 		case atc.GetAuthToken,
-			atc.CreateRebuild,
+			atc.CreateBuild,
 			atc.CreatePipe,
 			atc.GetContainer,
 			atc.HijackContainer,
