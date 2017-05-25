@@ -31,9 +31,9 @@ func (s *Server) CreateRebuild(build dbng.Build) http.Handler {
 			w.Write([]byte(err.Error()))
 		}
 
-		engineBuild, err := s.engine.LookupBuild(hLog, build)
+		engineBuild, err := s.engine.LookupBuild(logger, build)
 		if err != nil {
-			hLog.Error("failed-to-start-rebuild", err)
+			logger.Error("failed-to-start-rebuild", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
