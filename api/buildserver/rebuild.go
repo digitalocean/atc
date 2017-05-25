@@ -31,43 +31,14 @@ func (s *Server) CreateRebuild(build dbng.Build) http.Handler {
 			w.Write([]byte(err.Error()))
 		}
 
-		//p, ok, err := build.Pipeline()
-		//		if !ok {
-		//			if err != nil {
-		//				w.WriteHeader(http.StatusInternalServerError)
-		//				w.Write([]byte(err.Error()))
-		//				return
-		//			}
-		//			w.WriteHeader(http.StatusNotFound)
-		//			return
-		//		}
-		//
-		//		inputs, outputs, err := build.Resources()
-		//		if err != nil {
-		//			w.WriteHeader(http.StatusInternalServerError)
-		//			w.Write([]byte(err.Error()))
-		//			return
-		//		}
-		//
-		//		job, ok, err := p.Job(build.JobName())
-		//		if !ok {
-		//			if err != nil {
-		//				w.WriteHeader(http.StatusInternalServerError)
-		//				w.Write([]byte(err.Error()))
-		//				return
-		//			}
-		//			w.WriteHeader(http.StatusNotFound)
-		//			return
-		//		}
-		//
-		//		engineBuild, err := s.engine.CreateBuild(hLog, build, plan)
-		//		if err != nil {
-		//			hLog.Error("failed-to-start-build", err)
-		//			w.WriteHeader(http.StatusInternalServerError)
-		//			return
-		//		}
-		//
-		//		go engineBuild.Resume(logger)
+		engineBuild, err := s.engine.LookupBuild(hLog, build)
+		if err != nil {
+			hLog.Error("failed-to-start-rebuild", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		go engineBuild.Resume(logger)
 
 		w.WriteHeader(http.StatusOK)
 
