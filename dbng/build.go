@@ -175,7 +175,7 @@ func (b *build) Reset() error {
 
 	rows, err := psql.Update("builds").
 		Set("status", BuildStatusPending).
-		Set("scheduled", false).
+		Set("scheduled", true).
 		Set("start_time", nil).
 		Set("end_time", nil).
 		Set("engine", nil).
